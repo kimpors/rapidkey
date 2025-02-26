@@ -22,8 +22,15 @@ int main(void)
 			if (ch == '\b' && ps - sbuf > 0)
 			{
 				printf("\033[0m");
-				putchar(*(ps--));
-				comove(row, --col);
+				comove(row, col--);
+				putchar(*ps--);
+				comove(row, col);
+				putchar(*ps);
+				comove(row, col);
+				continue;
+			}
+			else if (ch == '\b' && ps - sbuf == 0)
+			{
 				continue;
 			}
 
