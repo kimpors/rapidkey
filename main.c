@@ -2,13 +2,21 @@
 #include "cmdio.h"
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 int pop(void);
 void push(size_t val);
+char *generate(char *s, int times);
+
 static char *sbuf = "this is a test\nthis is also test\nAnd this is also test";
+static char *nums = "0123456789";
+static char *chrs = "abcdefghijklmnopqrstuvwxyz";
+static char *syms = "!@#$5^&*()";
+static char *mixes = "0123456789abcdefghijklmnopqrstuvwxyz!@#$5^&*()";
 
 int main(int argc, char *argv[])
 {
+	srand(time(NULL));
 	int r, c;
 
 	for (int i = 1; i < argc; i++)
@@ -19,11 +27,15 @@ int main(int argc, char *argv[])
 
 			if ( strcmp(argv[i], "numbers") == 0)
 			{
-				printf("numbers generator\n");
+				sbuf = generate(nums, 10);
+			}
+			else if (strcmp(argv[i], "characters") == 0)
+			{
+				sbuf = generate(chrs, 10);
 			}
 			else if (strcmp(argv[i], "symbols") == 0)
 			{
-				printf("symbols generator\n");
+				sbuf = generate(syms, 10);
 			}
 			else if (strcmp(argv[i], "words") == 0)
 			{
@@ -31,7 +43,7 @@ int main(int argc, char *argv[])
 			}
 			else if (strcmp(argv[i], "mixed") == 0)
 			{
-				printf("mixed generator\n");
+				sbuf = generate(mixes, 10);
 			}
 
 			if (!(i++ < argc - 1)) break;
@@ -53,8 +65,6 @@ int main(int argc, char *argv[])
 			exit(-1);
 		}
 	}
-
-	return 0;
 
 	char *ps = sbuf;
 	size_t row = 1, col = 1;
@@ -113,6 +123,28 @@ int main(int argc, char *argv[])
 
 	printf("\033[0m");
 	return 0;
+}
+
+#define TEXT_LEN 4096
+char tbuf[TEXT_LEN];
+
+int rand_range(int min, int max)
+{
+	return min + rand() % (max - min + 1);
+}
+
+char *generate(char *s, int times)
+{
+	size_t len = strlen(s);
+
+	if (times > TEXT_LEN) times = TEXT_LEN;
+
+	for (int i = 0; i < times; i++)
+	{
+		tbuf[i] = s[rand_range(0, len - 1)];
+	}
+
+	return tbuf;
 }
 
 #define BUF_LEN 255
