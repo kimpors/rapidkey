@@ -6,7 +6,7 @@
 
 int pop(void);
 void push(size_t val);
-char *generate(char *s, int times);
+char *generate(char *s, int row, int col);
 
 static char *sbuf = "this is a test\nthis is also test\nAnd this is also test";
 static char *nums = "0123456789";
@@ -17,6 +17,7 @@ static char *mixes = "0123456789abcdefghijklmnopqrstuvwxyz!@#$5^&*()";
 int main(int argc, char *argv[])
 {
 	srand(time(NULL));
+	char *option;
 	int r, c;
 
 	for (int i = 1; i < argc; i++)
@@ -25,39 +26,45 @@ int main(int argc, char *argv[])
 		{
 			i = i < argc ? i + 1 : i;
 
-			if ( strcmp(argv[i], "numbers") == 0)
+			if (strcmp(argv[i], "numbers") == 0)
 			{
-				sbuf = generate(nums, 10);
+				option = nums;
 			}
 			else if (strcmp(argv[i], "characters") == 0)
 			{
-				sbuf = generate(chrs, 10);
+				option = chrs;
 			}
 			else if (strcmp(argv[i], "symbols") == 0)
 			{
-				sbuf = generate(syms, 10);
+				option = syms;
 			}
 			else if (strcmp(argv[i], "words") == 0)
 			{
 				printf("words generator\n");
+				break;
 			}
 			else if (strcmp(argv[i], "mixed") == 0)
 			{
-				sbuf = generate(mixes, 10);
+				option = mixes;
 			}
 
-			if (!(i++ < argc - 1)) break;
-
-			if (sscanf(argv[i], "%dx%d", &r, &c))
+			if (!(i++ < argc - 1))
+			{
+				sbuf = generate(option, 10, 10);
+			}
+			else if (sscanf(argv[i], "%dx%d", &r, &c))
 			{
 				printf("row: %d\n", r);
 				printf("col: %d\n", r);
+
+				sbuf = generate(option, r, c);
+				break;
 			}
 		}
 		else if (strcmp(argv[i], "help") == 0)
 		{
 			printf("help page\n");
-			break;
+			exit(-1);
 		}
 		else
 		{
@@ -133,15 +140,27 @@ int rand_range(int min, int max)
 	return min + rand() % (max - min + 1);
 }
 
-char *generate(char *s, int times)
+char *generate(char *s, int row, int col)
 {
 	size_t len = strlen(s);
 
-	if (times > TEXT_LEN) times = TEXT_LEN;
+	if (row > 60) row = 60;
+	if (col > 60) col = 60;
 
-	for (int i = 0; i < times; i++)
+	int j = 0;
+	int offset = 0;
+
+	tbuf[row * col] = '\0';
+
+	for (int i = 1; i <= row; i++)
 	{
-		tbuf[i] = s[rand_range(0, len - 1)];
+		while (j < col * i + offset)
+		{
+			tbuf[j++] = s[rand_range(0, len - 1)];
+		}
+
+		offset++;
+		tbuf[j++] = '\n';
 	}
 
 	return tbuf;
